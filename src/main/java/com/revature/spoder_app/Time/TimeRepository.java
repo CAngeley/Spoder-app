@@ -1,4 +1,8 @@
 package com.revature.spoder_app.Time;
 
-public interface TimeRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface TimeRepository extends JpaRepository<Time, Integer> {
 }

@@ -14,17 +14,19 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
+    @Column(nullable = false)
     private String firstName;
+    @Column(nullable = false)
     private String lastName;
     @Column(unique = true, nullable = false)
     private String email;
     @Column(nullable = false)
     private String password;
-    @Column(name = "user_type", columnDefinition = "varchar(10) default 'CUSTOMER'")
+    @Column(name = "user_type", columnDefinition = "varchar(8) default 'CUSTOMER'")
     @Enumerated(EnumType.STRING)
-    private userType userType;
+    private UserType userType;
 
-    public enum userType {
+    public enum UserType {
         CUSTOMER, EMPLOYEE, ADMIN
     }
 
