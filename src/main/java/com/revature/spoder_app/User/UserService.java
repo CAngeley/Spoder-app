@@ -40,7 +40,7 @@ public class UserService implements Serviceable<User> {
 
     @Override
     public User findById(int id) {
-        return null;
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -55,5 +55,9 @@ public class UserService implements Serviceable<User> {
 
     public void deleteAll() {
         userRepository.deleteAll();
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
