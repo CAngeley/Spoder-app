@@ -1,6 +1,7 @@
 package com.revature.spoder_app.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,11 +32,11 @@ public class UserController {
      * @return A response entity with the user that was added to the database
      */
     @PostMapping("/register")
-    public ResponseEntity<User> postNewUser(@RequestBody User user) {
+    public ResponseEntity<Object> postNewUser(@RequestBody User user) {
         try {
             return ResponseEntity.status(201).body(userService.create(user));
         } catch (Exception e) {
-            return ResponseEntity.status(400).build();
+            return ResponseEntity.status(400).body("Error: " + e.getMessage());
         }
     }
 
@@ -48,7 +49,11 @@ public class UserController {
         if (userType != User.UserType.ADMIN) {
             return ResponseEntity.status(403).build();
         }
-        return ResponseEntity.ok(userService.findAll());
+        List<User> users = userService.findAll();
+        if (users.isEmpty()) {
+            return ResponseEntity.status(204).body(users);
+        }
+        return ResponseEntity.ok(users);
     }
 
     /**
@@ -57,18 +62,45 @@ public class UserController {
      * @return A response entity with the user that was retrieved
      */
     @GetMapping("/id/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable int id) {
-        return ResponseEntity.ok(userService.findById(id));
+    public ResponseEntity<User> getUserById(@RequestHeader User.UserType userType, @RequestHeader int userId, @PathVariable int id) {
+        if(userId != id && userType != User.UserType.ADMIN) {
+            return ResponseEntity.status(403).build();
+        }
+        User user = userService.findById(id);
+        if (user == null) {
+            return ResponseEntity.status(404).build();
+        }
+        return ResponseEntity.ok(user);
     }
 
     /**
-     * Retrieves a user by their email
-     * @param email The email of the user to be retrieved
+     * Retrieves a user by their id from the header
+     * @param userId The id of the user to be retrieved
      * @return A response entity with the user that was retrieved
      */
-    @GetMapping("/email/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        return ResponseEntity.ok(userService.findByEmail(email));
+    @GetMapping("/user")
+    public ResponseEntity<Object> getUser(@RequestHeader int userId) {
+        User user = userService.findById(userId);
+        if (user == null) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+        return ResponseEntity.ok(user);
+    }
+
+    /**
+     * Updates a user in the database
+     * @param updatedUser The updated user
+     * @return A response entity with the updated user
+     */
+    @PutMapping("/update")
+    public ResponseEntity<Object> updateUser(@RequestHeader User.UserType userType, @RequestHeader int userId, @RequestBody User updatedUser) {
+        updatedUser.setUserId(userId);
+        updatedUser.setUserType(userType);
+        try {
+            return ResponseEntity.ok(userService.update(updatedUser));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Error: " + e.getMessage());
+        }
     }
 
     /**
@@ -91,33 +123,15 @@ public class UserController {
      * @param id The id of the user to be deleted
      * @return A response entity with a message indicating the success or failure of the operation
      */
-    public ResponseEntity<String> deleteUserById(@RequestHeader User.UserType userType, @PathVariable int id) {
-        if (userType != User.UserType.ADMIN) {
-            return ResponseEntity.status(403).body("You do not have permission to delete users");
+    @DeleteMapping("/id/{id}")
+    public ResponseEntity<String> deleteUserById(@RequestHeader User.UserType userType, @RequestHeader int userId, @PathVariable int id) {
+        if (userId != id) {
+            if (userType != User.UserType.ADMIN) {
+                return ResponseEntity.status(403).body("You do not have permission to delete this user");
+            }
         }
 
         userService.delete(userService.findById(id));
         return ResponseEntity.ok("User deleted");
     }
-
-    /**
-     * Deletes a user by their email. Only users with the ADMIN role can access this endpoint.
-     * @param email The email of the user to be deleted
-     * @return A response entity with a message indicating the success or failure of the operation
-     */
-    public ResponseEntity<String> deleteUserByEmail(@RequestHeader User.UserType userType, @PathVariable String email) {
-        if (userType != User.UserType.ADMIN) {
-            return ResponseEntity.status(403).body("You do not have permission to delete users");
-        }
-
-        userService.delete(userService.findByEmail(email));
-        return ResponseEntity.ok("User deleted");
-    }
-
-
-
-
-
-
-
 }

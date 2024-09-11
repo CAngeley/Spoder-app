@@ -22,7 +22,7 @@ public class User {
     private String email;
     @Column(nullable = false)
     private String password;
-    @Column(name = "user_type", columnDefinition = "varchar(8) default 'CUSTOMER'")
+    @Column(name = "user_type", columnDefinition = "varchar(8) default 'CUSTOMER'", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserType userType;
 
