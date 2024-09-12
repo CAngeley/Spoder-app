@@ -33,6 +33,14 @@ public class AuthController {
         this.userService = userService;
     }
 
+    /**
+     * This method is used to log in a user.
+     * It will authenticate the user and generate a JWT for the user.
+     * The JWT will be returned in the response.
+     * @param email The email of the user to log in.
+     * @param password The password of the user to log in.
+     * @return The response entity of the login.
+     */
     @PostMapping("/users/login")
     public ResponseEntity<?> postLogin(@RequestParam String email, @RequestParam String password) {
         try {

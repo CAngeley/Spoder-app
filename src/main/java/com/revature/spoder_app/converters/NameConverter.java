@@ -9,8 +9,13 @@ import jakarta.persistence.Converter;
 @Converter(autoApply = true)
 public class NameConverter implements AttributeConverter<Name, String> {
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * This method is used to convert a Name object to a JSON string.
+     * @param name The Name object to convert.
+     * @return The JSON string that was converted from the Name object.
+     */
     @Override
-    // takes in CurrentCondition instance and serializes it into a json string to store in database
     public String convertToDatabaseColumn(Name name) {
         if(name == null) {
             return null;
@@ -22,6 +27,11 @@ public class NameConverter implements AttributeConverter<Name, String> {
         }
     }
 
+    /**
+     * This method is used to convert a JSON string to a Name object.
+     * @param dbData The JSON string to convert.
+     * @return The Name object that was converted from the JSON string.
+     */
     @Override
     public Name convertToEntityAttribute(String dbData) {
         if(dbData == null) {

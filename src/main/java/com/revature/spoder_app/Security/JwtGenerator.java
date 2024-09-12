@@ -12,10 +12,19 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
+/**
+ * This class is used to generate JWTs for users.
+ */
 @Component
 public class JwtGenerator {
     private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
+    /**
+     * This method is used to generate a JWT for a user.
+     * @param auth The authentication of the user.
+     * @param id The id of the user.
+     * @return The JWT that was generated.
+     */
     public String generateToken(Authentication auth, int id) {
         String email = auth.getName();
         Date currentDate = new Date();
@@ -31,6 +40,11 @@ public class JwtGenerator {
         return token;
     }
 
+    /**
+     * This method is used to extract the email from a JWT.
+     * @param token The JWT to extract the email from.
+     * @return The email that was extracted from the JWT.
+     */
     public String getUserEmailFromJwt(String token) {
         Claims claims = Jwts.parserBuilder()
             .setSigningKey(key)
@@ -40,6 +54,11 @@ public class JwtGenerator {
         return claims.getSubject();
     }
 
+    /**
+     * This method is used to validate a JWT.
+     * @param token The JWT to validate.
+     * @return True if the JWT is valid, false otherwise.
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
