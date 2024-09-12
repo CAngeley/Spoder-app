@@ -22,4 +22,9 @@ public class Tracking {
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;
+
+    public Tracking(User user, Task savedTask) {
+        this.user = user;
+        this.task = savedTask;
+    }
 }

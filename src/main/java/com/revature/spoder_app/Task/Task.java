@@ -4,6 +4,7 @@ import com.revature.spoder_app.Filter.Filter;
 import com.revature.spoder_app.Name;
 import com.revature.spoder_app.Note;
 import com.revature.spoder_app.Time.Time;
+import com.revature.spoder_app.User.User;
 import com.revature.spoder_app.converters.NameConverter;
 import com.revature.spoder_app.converters.NoteConverter;
 import jakarta.persistence.*;
@@ -22,6 +23,10 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int taskId;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(columnDefinition = "json")
     @Convert(converter = NameConverter.class)
