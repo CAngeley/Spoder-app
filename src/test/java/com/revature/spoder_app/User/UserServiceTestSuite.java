@@ -19,13 +19,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTestSuite {
     @Mock
-    private UserRepository userRepository;
+    private UserRepository mockUserRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private UserService userService;
+    private UserService mockUserService;
 
     User mockUser;
 
@@ -50,8 +50,8 @@ public class UserServiceTestSuite {
     public void testCreateUser() throws JsonProcessingException {
         System.out.println("Mock user: " + mockUser.toString());
         when(passwordEncoder.encode(mockUser.getPassword())).thenReturn("encodedPassword123");
-        when(userRepository.saveAndFlush(mockUser)).thenReturn(mockUser);
-        User createdUser = userService.create(mockUser);
+        when(mockUserRepository.saveAndFlush(mockUser)).thenReturn(mockUser);
+        User createdUser = mockUserService.create(mockUser);
         assertEquals(mockUser, createdUser);
         System.out.println("User created: " + createdUser.toString());
     }
@@ -62,12 +62,15 @@ public class UserServiceTestSuite {
      */
     @Test
     public void testFindAll() {
-        User testUser = new User();
-        when(userRepository.findAll()).thenReturn(List.of(mockUser, testUser));
-        List<User> users = userService.findAll();
-        assertEquals(2, users.size());
-        assertEquals(mockUser, users.get(0));
-        System.out.println("Users: " + users);
+        List<User> mockUsers = List.of(mockUser, mockUser);
+        when(mockUserRepository.findAll()).thenReturn(mockUsers);
+
+        List<User> foundUsers = mockUserService.findAll();
+
+        assertEquals(mockUsers.size(), foundUsers.size());
+        assertEquals(mockUsers, foundUsers);
+        verify(mockUserRepository).findAll();
+        System.out.println("Users: " + foundUsers);
     }
 
     /**
@@ -76,9 +79,12 @@ public class UserServiceTestSuite {
      */
     @Test
     public void testFindById() {
-        when(userRepository.findById(1)).thenReturn(java.util.Optional.of(mockUser));
-        User user = userService.findById(1);
+        when(mockUserRepository.findById(mockUser.getUserId())).thenReturn(java.util.Optional.of(mockUser));
+        
+        User user = mockUserService.findById(mockUser.getUserId());
+        
         assertEquals(mockUser, user);
+        verify(mockUserRepository).findById(mockUser.getUserId());
         System.out.println("User found: " + user.toString());
     }
 
@@ -93,10 +99,10 @@ public class UserServiceTestSuite {
         User updatedUser = mockUser;
         updatedUser.setPassword("newPassword123");
         System.out.println("Original user: " + mockUser);
-        when(userRepository.findById(updatedUser.getUserId())).thenReturn(java.util.Optional.of(mockUser));
+        when(mockUserRepository.findById(updatedUser.getUserId())).thenReturn(java.util.Optional.of(mockUser));
         when(passwordEncoder.encode(updatedUser.getPassword())).thenReturn("encodedNewPassword123");
-        when(userRepository.saveAndFlush(updatedUser)).thenReturn(updatedUser);
-        User user = userService.update(updatedUser);
+        when(mockUserRepository.saveAndFlush(updatedUser)).thenReturn(updatedUser);
+        User user = mockUserService.update(updatedUser);
         assertEquals(updatedUser, user);
         System.out.println("User updated: " + user);
     }
@@ -107,8 +113,8 @@ public class UserServiceTestSuite {
      */
     @Test
     public void testDeleteUser() {
-        when(userRepository.findById(mockUser.getUserId())).thenReturn(java.util.Optional.of(mockUser));
-        Boolean deleted = userService.delete(mockUser);
+        when(mockUserRepository.findById(mockUser.getUserId())).thenReturn(java.util.Optional.of(mockUser));
+        Boolean deleted = mockUserService.delete(mockUser);
         assertEquals(true, deleted);
         System.out.println("User id deleted: " + mockUser.getUserId());
     }
@@ -119,8 +125,8 @@ public class UserServiceTestSuite {
      */
     @Test
     public void testDeleteAllUsers() {
-        userService.deleteAll();
-        verify(userRepository).deleteAll();
+        mockUserService.deleteAll();
+        verify(mockUserRepository).deleteAll();
         System.out.println("All users deleted");
     }
 

@@ -63,7 +63,7 @@ public class UserController {
      */
     @GetMapping("/id/{id}")
     public ResponseEntity<User> getUserById(@RequestHeader User.UserType userType, @RequestHeader int userId, @PathVariable int id) {
-        if(userId != id && userType != User.UserType.ADMIN) {
+        if(userType != User.UserType.ADMIN && userId != id) {
             return ResponseEntity.status(403).build();
         }
         User user = userService.findById(id);

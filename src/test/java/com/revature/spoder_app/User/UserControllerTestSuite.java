@@ -172,13 +172,14 @@ public class UserControllerTestSuite {
      */
     @Test
     public void testGetAllUsersEmpty() {
-        when(mockUserService.findAll()).thenReturn(List.of());
+        List<User> users = List.of();
+        when(mockUserService.findAll()).thenReturn(users);
 
         ResponseEntity<List<User>> response = userController.getAllUsers(User.UserType.ADMIN);
 
         assertEquals(204, response.getStatusCode().value());
         System.out.println("Response Code: " + response.getStatusCode().value());
-        assertEquals(List.of(), response.getBody());
+        assertEquals(users, response.getBody());
         System.out.println("Response Body: " + response.getBody());
         verify(mockUserService).findAll();
     }
@@ -216,8 +217,8 @@ public class UserControllerTestSuite {
      * Tests the getUserById method in the UserController class with a different user id
      */
     @Test
-    public void testGetUserByIdDifferentUserId() {
-        ResponseEntity<User> response = userController.getUserById(User.UserType.CUSTOMER,2, 1);
+    public void testGetUserByIdNotMatchingUserId() {
+        ResponseEntity<User> response = userController.getUserById(User.UserType.CUSTOMER,1, 2);
 
         assertEquals(403, response.getStatusCode().value());
         System.out.println("Response Code: " + response.getStatusCode().value());
